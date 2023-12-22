@@ -19,10 +19,9 @@ public class GameScreen {
     private static GameScreen instance = null;
     public static final int FRAME_DELAY = 50;
     private final Screen terminalScreen;
-    private final List<Element> elements = new ArrayList<>();
+    private final List<GameElement> gameElements = new ArrayList<>();
 
     private GameScreen() throws IOException {
-
         Terminal terminal = new DefaultTerminalFactory(System.out, System.in, Charset.defaultCharset()).createTerminal();
         terminal.setForegroundColor(TextColor.ANSI.WHITE);
         terminal.setBackgroundColor(TextColor.ANSI.BLACK);
@@ -31,42 +30,39 @@ public class GameScreen {
     }
 
     public static GameScreen getInstance() throws IOException {
-
         if (instance == null){
             instance = new GameScreen();
         }
-
         return instance;
-
     }
 
     public Screen getTerminalScreen(){
         return this.terminalScreen;
     }
 
-    public Element getElementAtIgnoringSnakeHead(int x, int y){
-        for(Element element : this.elements){
-            if(element.x() == x && element.y() == y && element.type() != Element.Type.SNAKE_HEAD){
-                return element;
+    public GameElement getElementAtIgnoringSnakeHead(int x, int y){
+        for(GameElement gameElement : this.gameElements){
+            if(gameElement.x() == x && gameElement.y() == y && gameElement.type() != GameElement.Type.SNAKE_HEAD){
+                return gameElement;
             }
         }
         return null;
     }
 
     public void clearElements(){
-        this.elements.clear();
+        this.gameElements.clear();
     }
 
-    public void submitElement(Element e){
-        if(!elements.contains(e)){
-            elements.add(e);
+    public void submitElement(GameElement e){
+        if(!gameElements.contains(e)){
+            gameElements.add(e);
         }
     }
 
-    public void submitAllElements(Collection<Element> points){
-        for(Element e : points){
-            if(!elements.contains(e)){
-                elements.add(e);
+    public void submitAllElements(Collection<GameElement> points){
+        for(GameElement e : points){
+            if(!gameElements.contains(e)){
+                gameElements.add(e);
             }
         }
     }
@@ -80,7 +76,7 @@ public class GameScreen {
                 this.terminalScreen.setCharacter(j, i + 1, new TextCharacter(' '));
             }
         }
-        for(Element e : this.elements){
+        for(GameElement e : this.gameElements){
             TextCharacter character = new TextCharacter(e.type().getGraphic()).withForegroundColor(e.type().getColor());
             this.terminalScreen.setCharacter(e.x(), e.y() + 1, character);
         }

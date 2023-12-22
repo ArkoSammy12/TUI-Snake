@@ -5,10 +5,10 @@ import java.util.List;
 
 public class Snake {
 
-    private int[] pos = new int[2];
+    private int[] pos;
     private Direction direction;
     private Snake next;
-    private Snake prev;
+    private final Snake prev;
 
     public Snake(int[] pos, Direction direction, Snake next, Snake prev){
         this.pos = pos;
@@ -34,12 +34,8 @@ public class Snake {
         return this.direction;
     }
 
-    public int[] getPosition(){
-        return this.pos;
-    }
-
-    public List<Element> getSnakeNodes(List<Element> snakeNodes){
-        snakeNodes.add(new Element(this.pos[0], this.pos[1], Element.Type.SNAKE_HEAD));
+    public List<GameElement> getSnakeNodes(List<GameElement> snakeNodes){
+        snakeNodes.add(new GameElement(this.pos[0], this.pos[1], GameElement.Type.SNAKE_HEAD));
         if(this.next != null){
             return this.next.snakeNodesAfterHead(snakeNodes);
         }
@@ -47,8 +43,8 @@ public class Snake {
 
     }
 
-    private List<Element> snakeNodesAfterHead(List<Element> snakeNodes){
-        snakeNodes.add(new Element(this.pos[0], this.pos[1], Element.Type.SNAKE_BODY));
+    private List<GameElement> snakeNodesAfterHead(List<GameElement> snakeNodes){
+        snakeNodes.add(new GameElement(this.pos[0], this.pos[1], GameElement.Type.SNAKE_BODY));
         if(this.next != null){
             this.next.snakeNodesAfterHead(snakeNodes);
         }
@@ -56,8 +52,7 @@ public class Snake {
     }
 
     public void updatePositions() throws IOException {
-        int[] newPos = this.direction.addPosition(pos);
-        this.pos = newPos;
+        this.pos = this.direction.addPosition(pos);
         this.wrapPositionIfNeeded();
         if (this.next != null) {
             this.next.updatePositions();
@@ -98,14 +93,13 @@ public class Snake {
 
     public CollisionType checkCollision(Game game){
         int[] pos = this.pos;
-        Element elementAtPos = game.getScreen().getElementAtIgnoringSnakeHead(pos[0], pos[1]);
-        if(elementAtPos == null){
+        GameElement gameElementAtPos = game.getScreen().getElementAtIgnoringSnakeHead(pos[0], pos[1]);
+        if(gameElementAtPos == null){
             return CollisionType.NONE;
         }
-        return switch(elementAtPos.type()){
+        return switch(gameElementAtPos.type()){
             case APPLE -> CollisionType.APPLE;
-            case SNAKE_BODY -> CollisionType.WALL;
-            case WALL -> CollisionType.WALL;
+            case SNAKE_BODY, WALL -> CollisionType.WALL;
             case SNAKE_HEAD -> CollisionType.NONE;
         };
     }
@@ -118,14 +112,14 @@ public class Snake {
         }
     }
 
-    enum Direction {
+    public enum Direction {
 
         UP(new int[]{0, 1}),
         RIGHT(new int[]{1, 0}),
         DOWN(new int[]{0, -1}),
         LEFT(new int[]{-1, 0});
 
-        int[] vec = new int[2];
+        private final int[] vec;
 
         Direction(int[] vec){
 
@@ -150,10 +144,10 @@ public class Snake {
 
     }
 
-    enum CollisionType {
+    public enum CollisionType {
         NONE,
         APPLE,
-        WALL;
+        WALL
     }
 
 }

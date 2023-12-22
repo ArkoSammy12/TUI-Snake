@@ -1,20 +1,21 @@
 package xd.arkosammy.snake;
 
 import com.googlecode.lanterna.graphics.TextGraphics;
+import com.googlecode.lanterna.input.KeyStroke;
+import com.googlecode.lanterna.screen.Screen;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-import javax.swing.JFrame;
 
 public class Game {
 
     private static Game game;
-    private final Snake SNAKE_HEAD;
-    private Element apple;
-    private final Random random;
     private final GameScreen gameScreen;
+    private final Snake SNAKE_HEAD;
+    private GameElement apple;
+    private final Random random;
     private int score;
 
     public static Game getInstance() throws IOException {
@@ -31,14 +32,11 @@ public class Game {
 
         int initX = this.random.nextInt(0, this.gameScreen.getTerminalScreen().getTerminalSize().getColumns() - 1);
         int initY = this.random.nextInt(0, this.gameScreen.getTerminalScreen().getTerminalSize().getRows() - 1);
-
         this.SNAKE_HEAD = new Snake(new int[]{initX, initY}, Snake.Direction.RIGHT, null, null);
-
 
         int appleX = this.random.nextInt(0, this.gameScreen.getTerminalScreen().getTerminalSize().getColumns() - 1);
         int appleY = this.random.nextInt(0, this.gameScreen.getTerminalScreen().getTerminalSize().getRows() - 1);
-
-        apple = new Element(appleX, appleY, Element.Type.APPLE);
+        apple = new GameElement(appleX, appleY, GameElement.Type.APPLE);
 
     }
 
@@ -53,13 +51,12 @@ public class Game {
     public void startLoop() throws InterruptedException, IOException {
 
         loop: while(true){
-
             this.gameScreen.clearElements();
-            SnakeController.checkInput();
+            checkInput();
             this.gameScreen.submitElement(apple);
             SNAKE_HEAD.updatePositions();
             SNAKE_HEAD.updateDirections();
-            List<Element> snakeNodes = SNAKE_HEAD.getSnakeNodes(new ArrayList<>());
+            List<GameElement> snakeNodes = SNAKE_HEAD.getSnakeNodes(new ArrayList<>());
             this.gameScreen.submitAllElements(snakeNodes);
             Snake.CollisionType collisionType = SNAKE_HEAD.checkCollision(this);
             switch(collisionType){
@@ -75,7 +72,37 @@ public class Game {
 
     }
 
-    public void onSnakeAttemptMove(Snake.Direction moveDirection){
+    private static void checkInput() throws IOException {
+
+        GameScreen gameScreen = GameScreen.getInstance();
+        Screen screen = gameScreen.getTerminalScreen();
+        KeyStroke keyStroke = screen.pollInput();
+
+        if(keyStroke != null){
+
+            Snake.Direction moveDirection = switch(keyStroke.getCharacter()){
+
+                case 'w' -> Snake.Direction.DOWN;
+                case 's' -> Snake.Direction.UP;
+                case 'a' -> Snake.Direction.LEFT;
+                case 'd' -> Snake.Direction.RIGHT;
+                default -> null;
+
+            };
+
+            if(moveDirection != null){
+                try {
+                    Game.getInstance().onSnakeAttemptMove(moveDirection);
+                } catch (IOException ex) {
+                    throw new RuntimeException(ex);
+                }
+            }
+
+        }
+
+    }
+
+    private void onSnakeAttemptMove(Snake.Direction moveDirection){
         if(this.SNAKE_HEAD.getDirection().getOpposite() == moveDirection){
             return;
         }
@@ -91,12 +118,12 @@ public class Game {
             appleY = this.random.nextInt(0, this.gameScreen.getTerminalScreen().getTerminalSize().getRows() - 1);
         } while (isSnakeOccupying(appleX, appleY));
 
-        this.apple = new Element(appleX, appleY, Element.Type.APPLE);
+        this.apple = new GameElement(appleX, appleY, GameElement.Type.APPLE);
     }
 
     private boolean isSnakeOccupying(int x, int y) {
-        for (Element element : this.SNAKE_HEAD.getSnakeNodes(new ArrayList<>())) {
-            if (element.x() == x && element.y() == y) {
+        for (GameElement gameElement : this.SNAKE_HEAD.getSnakeNodes(new ArrayList<>())) {
+            if (gameElement.x() == x && gameElement.y() == y) {
                 return true;
             }
         }

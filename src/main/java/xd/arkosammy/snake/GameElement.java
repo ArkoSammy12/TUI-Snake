@@ -2,7 +2,7 @@ package xd.arkosammy.snake;
 
 import com.googlecode.lanterna.TextColor;
 
-public record Element(int x, int y, Type type) {
+public record GameElement(int x, int y, Type type) {
 
     enum Type {
 
@@ -11,8 +11,8 @@ public record Element(int x, int y, Type type) {
         SNAKE_BODY('V', TextColor.ANSI.GREEN),
         WALL('#', TextColor.ANSI.WHITE);
 
-        final char graphic;
-        final TextColor color;
+        private final char graphic;
+        private final TextColor color;
 
         Type(char graphic, TextColor color){
             this.graphic = graphic;
