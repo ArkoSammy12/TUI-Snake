@@ -52,7 +52,6 @@ public class Game {
 
         loop: while(true){
             this.gameScreen.clearElements();
-            //checkInput();
             this.gameScreen.submitElement(apple);
             SNAKE_HEAD.updatePositions();
             SNAKE_HEAD.updateDirections();
