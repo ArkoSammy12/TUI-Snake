@@ -52,7 +52,7 @@ public class Game {
 
         loop: while(true){
             this.gameScreen.clearElements();
-            checkInput();
+            //checkInput();
             this.gameScreen.submitElement(apple);
             SNAKE_HEAD.updatePositions();
             SNAKE_HEAD.updateDirections();
@@ -72,9 +72,8 @@ public class Game {
 
     }
 
-    private static void checkInput() throws IOException {
+    public static void checkInput(GameScreen gameScreen) throws IOException {
 
-        GameScreen gameScreen = GameScreen.getInstance();
         Screen screen = gameScreen.getTerminalScreen();
         KeyStroke keyStroke = screen.pollInput();
 
