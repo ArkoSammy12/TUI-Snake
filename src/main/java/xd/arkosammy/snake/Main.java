@@ -11,7 +11,7 @@ public class Main {
         ExecutorService executorService = Executors.newSingleThreadExecutor();
         executorService.submit(new SnakeInputHandler(game.getScreen()));
         game.startLoop();
-        executorService.shutdown();
+        executorService.shutdownNow();
 
     }
 
