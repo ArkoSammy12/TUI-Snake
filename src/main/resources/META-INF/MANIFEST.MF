@@ -1,0 +1,4 @@
+Manifest-Version: 1.0
+Main-Class: xd.arkosammy.snake.Main
+Class-Path: lanterna-3.2.0-alpha1.jar
+
