@@ -25,6 +25,7 @@ public class GameScreen {
         Terminal terminal = new DefaultTerminalFactory(System.out, System.in, Charset.defaultCharset()).createTerminal();
         terminal.setForegroundColor(TextColor.ANSI.WHITE);
         terminal.setBackgroundColor(TextColor.ANSI.BLACK);
+        terminal.setCursorVisible(false);
         terminalScreen = new TerminalScreen(terminal);
         this.terminalScreen.startScreen();
     }
